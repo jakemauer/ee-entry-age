@@ -11,10 +11,10 @@ $plugin_info       = array(
 	'pi_usage'       => entry_age::usage()  
 	);  
   
-class Entry_age  
+class entry_age  
 {  
   
-	function Entry_age()  
+	function entry_age()  
 	{
 
 		$this->EE =& get_instance();
@@ -22,6 +22,7 @@ class Entry_age
 		$unit = $this->EE->TMPL->fetch_param('unit') != '' ? $this->EE->TMPL->fetch_param('unit') : 'days';
 		$max_age_in = $this->EE->TMPL->fetch_param('max_age') != '' ? $this->EE->TMPL->fetch_param('max_age') : 90;
 		$entry_epoch = $this->EE->TMPL->fetch_param('entry_date') != '' ? $this->EE->TMPL->fetch_param('entry_date') : 0;
+		$reverse = $this->EE->TMPL->fetch_param('reverse') != '' ? $reverse = $this->EE->TMPL->fetch_param('reverse') : "no";
 		$current_epoch = date('U');
 		
 		/*
@@ -69,7 +70,13 @@ class Entry_age
 			set the return message based on whether or not the entry is older than the specified age
 		*/
 		
-		$this->return_data = ($entry_age > $max_age) ? $return_template : '';
+		if ($reverse == "yes") {
+			$this->return_data = ($entry_age < $max_age) ? $return_template : '';
+		} else {
+			$this->return_data = ($entry_age > $max_age) ? $return_template : '';
+		}
+
+
 
 	}
   
@@ -92,13 +99,13 @@ class Entry_age
 		
 		{exp:entry_age unit="days" max_age="90" entry_date="{entry_date}"}
 	
-		Three parameters can be passed:
+		Four parameters can be passed:
 
 		- 'unit' : <days|weeks|months|years> - pick one, based on your requirements.  This setting will default to 'days' if not specified.
 		- 'max_age' : <maximum age of entry> - The maximum age of the entry before the warning message will be shown.  This setting will default to 90 if not specified.  Ommiting this parameter may result in fairly useless data if used with anything other than 'days' above.
 			
 		- 'entry_date' : Because this is my first plugin I'm yet to figure out how to get the current entry's date inside the plugin, forcing me to require it as a parameter.  :(  For that reason, this parameter should only be '{entry_date}' as shown above.
-
+		- 'reverse'	: If you'd like to show the message if the post is younger than the max_age, set this to "yes". Defaults to "no"
 		The text inside the {exp:entry_age}{/exp:entry_age} tag pairs is the text that will be displayed if the entry is older than the specified date.  Ommiting this parameter will display the default value set above, if the entry's age does not meet requirements.
 	  
 		<?php  
